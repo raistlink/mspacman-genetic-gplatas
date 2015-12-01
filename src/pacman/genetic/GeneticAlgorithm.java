@@ -16,7 +16,7 @@ import java.util.ArrayList;     // arrayLists are more versatile than arrays
 
 public class GeneticAlgorithm {
     // --- constants
-    static int CHROMOSOME_SIZE=10;
+    static int CHROMOSOME_SIZE=44;
     static int POPULATION_SIZE=500;
 
     // --- variables:
@@ -88,6 +88,8 @@ public class GeneticAlgorithm {
         // If you wish the evolution to halt (for instance, after a number of
         //   generations is reached or the maximum fitness has been achieved),
         //   this is the place to make any such checks
+        
+        /*
         while(true){
             // --- evaluate current generation:
             population.evaluateGeneration();
@@ -122,6 +124,8 @@ public class GeneticAlgorithm {
             population.produceNextGeneration();
             generationCount++;
         }
+        
+        */
     }
 };
 

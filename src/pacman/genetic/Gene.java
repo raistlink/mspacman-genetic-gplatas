@@ -1,5 +1,9 @@
 package pacman.genetic;
 
+import java.util.Arrays;
+import java.util.Random;
+
+import pacman.genetic.GeneticAlgorithm;
 public class Gene {
     // --- variables:
 
@@ -13,11 +17,13 @@ public class Gene {
      * must have a strictly higher fitness than a worse solution
      */
     protected float mFitness;
+    protected Boolean isEvaluated;
     /**
      * The chromosome contains only integers 0 or 1 (we choose to avoid
      * using a boolean type to make computations easier)
      */
     protected int mChromosome[];
+    protected int decodedChromosome[][];
 
     // --- functions:
     /**
@@ -35,8 +41,54 @@ public class Gene {
     /**
      * Randomizes the numbers on the mChromosome array to values 0 or 1
      */
-    public void randomizeChromosome(){
-        // code for randomization of initial weights goes HERE
+ public void randomizeChromosome(){
+    	
+    	Random rand = new Random();
+    	
+        for(int i = 0; i < GeneticAlgorithm.CHROMOSOME_SIZE; i++){
+        	mChromosome[i] = rand.nextInt( 26 );
+        }
+        
+        getPhenotype(mChromosome);
+        
+        System.out.println(Arrays.toString(mChromosome));
+        printPhenotype(decodedChromosome);
+    }
+    
+    public void getPhenotype(int[] chromosome){
+    	
+    	decodedChromosome = new int[11][4];
+    	
+    	int sum = 0;
+    	int count = 0;
+    	
+    	for(int i = 0; i < 11; i++){
+    		for(int j = 0; j < 4; j++){
+    			
+    			decodedChromosome[i][j] = chromosome[count]+sum;
+    			sum = sum+chromosome[count];
+    			count++;
+    			
+    		}
+    		sum = 0;
+    	}
+  	
+    }
+    
+    public void printPhenotype(int[][] decodedChromosome){
+    
+    		System.out.println("Funcion de pertenencia - Eatability - POCO: "+Arrays.toString(decodedChromosome[0]));
+    		System.out.println("Funcion de pertenencia - Eatability - MUCHO: "+Arrays.toString(decodedChromosome[1]));
+    		System.out.println("Funcion de pertenencia - DangerDistance - NEAR: "+Arrays.toString(decodedChromosome[2]));
+    		System.out.println("Funcion de pertenencia - DangerDistance - NORMAL: "+Arrays.toString(decodedChromosome[3]));
+    		System.out.println("Funcion de pertenencia - DangerDistance - FAR: "+Arrays.toString(decodedChromosome[4]));
+    		System.out.println("Funcion de pertenencia - BigPillDiscance - NEAR: "+Arrays.toString(decodedChromosome[5]));
+    		System.out.println("Funcion de pertenencia - BigPillDiscance - NORMAL: "+Arrays.toString(decodedChromosome[6]));
+    		System.out.println("Funcion de pertenencia - BigPillDiscance - FAR: "+Arrays.toString(decodedChromosome[7]));
+    		System.out.println("Funcion de pertenencia - SmallPillDiscance - NEAR: "+Arrays.toString(decodedChromosome[8]));
+    		System.out.println("Funcion de pertenencia - SmallPillDiscance - NORMAL: "+Arrays.toString(decodedChromosome[9]));
+    		System.out.println("Funcion de pertenencia - SmallPillDiscance - FAR: "+Arrays.toString(decodedChromosome[10]));
+    		
     }
 
     /**
