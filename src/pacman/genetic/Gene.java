@@ -23,7 +23,7 @@ public class Gene {
      * using a boolean type to make computations easier)
      */
     protected int mChromosome[];
-    protected int decodedChromosome[][];
+    public int decodedChromosome[][];
 
     // --- functions:
     /**

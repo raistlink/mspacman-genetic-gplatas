@@ -1,6 +1,11 @@
 package pacman.genetic;
 
 import java.util.Collections;
+
+import pacman.Executor;
+import pacman.controllers.GenController;
+import pacman.controllers.examples.Legacy;
+
 import java.util.Random;        // for generating random numbers
 import java.util.ArrayList;     // arrayLists are more versatile than arrays
 
@@ -26,6 +31,7 @@ public class GeneticAlgorithm {
      * a simple array is due to extra functionalities of the arrayList, such as sorting)
      */
     ArrayList<Gene> mPopulation;
+    
 
     // --- functions:
 
@@ -76,14 +82,20 @@ public class GeneticAlgorithm {
      * @param index: the position in the population of the Gene we want to retrieve
      * @return the Gene at position <b>index</b> of the mPopulation arrayList
      */
-    public Gene getGene(int index){ return mPopulation.get(index); }
+    public  Gene getGene(int index){ return mPopulation.get(index); }
 
     // Genetic Algorithm maxA testing method
     public static void main( String[] args ){
         // Initializing the population (we chose 500 genes for the population,
         // but you can play with the population size to try different approaches)
         GeneticAlgorithm population = new GeneticAlgorithm(POPULATION_SIZE);
+        Executor exec = new Executor();
         int generationCount = 0;
+        
+        
+        exec.runExperiment(new GenController(population.getGene(1).decodedChromosome), new Legacy(), 1);
+        
+        
         // For the sake of this sample, evolution goes on forever.
         // If you wish the evolution to halt (for instance, after a number of
         //   generations is reached or the maximum fitness has been achieved),
