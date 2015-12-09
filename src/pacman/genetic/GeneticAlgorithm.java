@@ -67,8 +67,49 @@ public class GeneticAlgorithm {
      * If you want to use mutation, this function is where any mutation chances are rolled and mutation takes place.
      */
     public void produceNextGeneration(){
-        // use one of the offspring techniques suggested in class (also applying any mutations) HERE
+    	Random rand = new Random();
     	
+    	if(rand.nextInt(10) == 1){
+    		mPopulation.get(rand.nextInt(POPULATION_SIZE)).mutate();
+    	}
+    	
+    	float first = Float.NEGATIVE_INFINITY;
+    	int firstIndex = 0;
+    	float second = Float.NEGATIVE_INFINITY;
+    	int secondIndex = 0;
+    	
+    	float last = Float.POSITIVE_INFINITY;
+    	int lastIndex = 0;
+    	float secondToLast = Float.POSITIVE_INFINITY;
+    	int secondToLastIndex = 0;
+    	
+    	
+    	for(int i = 0; i < POPULATION_SIZE; i++){
+    		if(mPopulation.get(i).getFitness() > first){
+    			firstIndex = i;
+    			first = mPopulation.get(i).getFitness();
+    		}
+    		else if(mPopulation.get(i).getFitness() > second){	
+    			secondIndex = i;
+    			second = mPopulation.get(i).getFitness();
+    		}
+    		else if(mPopulation.get(i).getFitness() < last){
+    			lastIndex = i;
+    			last = mPopulation.get(i).getFitness();
+    			
+    		}
+    		else if(mPopulation.get(i).getFitness() < secondToLast){
+    			secondToLastIndex = 0;
+    			secondToLast =  mPopulation.get(i).getFitness();
+    		}
+    	}
+    	
+    	Gene[] newGenes = new Gene[2];
+    	
+    	newGenes = mPopulation.get(firstIndex).reproduce(mPopulation.get(secondIndex));
+    	
+    	mPopulation.set(lastIndex, newGenes[0]);
+    	mPopulation.set(secondToLastIndex, newGenes[1]);
     	
     }
 
@@ -90,19 +131,14 @@ public class GeneticAlgorithm {
         // but you can play with the population size to try different approaches)
         GeneticAlgorithm population = new GeneticAlgorithm(POPULATION_SIZE);
         Executor exec = new Executor();
+        
         int generationCount = 0;
         
-        
-        exec.runExperiment(new GenController(population.getGene(1).decodedChromosome), new Legacy(), 1);
-        
-        
-        // For the sake of this sample, evolution goes on forever.
-        // If you wish the evolution to halt (for instance, after a number of
-        //   generations is reached or the maximum fitness has been achieved),
-        //   this is the place to make any such checks
-        
-        /*
         while(true){
+	        for(int i = 0; i < POPULATION_SIZE; i++){ 
+	        		population.getGene(i).setFitness((float) exec.runExperiment(new GenController(population.getGene(1).decodedChromosome), new Legacy(), 10));
+	        }
+        
             // --- evaluate current generation:
             population.evaluateGeneration();
             // --- print results here:
@@ -113,7 +149,7 @@ public class GeneticAlgorithm {
             float minFitness=Float.POSITIVE_INFINITY;
             float maxFitness=Float.NEGATIVE_INFINITY;
             String bestIndividual="";
-		String worstIndividual="";
+            String worstIndividual="";
             for(int i = 0; i < population.size(); i++){
                 float currFitness = population.getGene(i).getFitness();
                 avgFitness += currFitness;
@@ -137,7 +173,7 @@ public class GeneticAlgorithm {
             generationCount++;
         }
         
-        */
+        
     }
 };
 
