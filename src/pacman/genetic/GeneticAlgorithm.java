@@ -159,7 +159,7 @@ public class GeneticAlgorithm {
     	            // produce next generation:
     	            population.produceNextGeneration();
     	            generationCount++;
-    	            if(maxFitness > 30000) break;
+    	            if(maxFitness > 50000) break;
     	        }
     	        write("BestGene.txt",population.getGene(0).mChromosome);
     	        System.out.println("El mejor individuo de la poblacion tiene el siguiente genotipo:");
