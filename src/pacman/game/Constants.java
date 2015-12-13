@@ -25,6 +25,8 @@ public final class Constants
 		NEUTRAL	{ public MOVE opposite(){return MOVE.NEUTRAL;	};};	
 		
 		public abstract MOVE opposite();
+
+
 	};
 	
 	/**

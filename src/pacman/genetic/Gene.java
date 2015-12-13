@@ -1,10 +1,12 @@
 package pacman.genetic;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 import pacman.genetic.GeneticAlgorithm;
-public class Gene {
+public class Gene{
     // --- variables:
 
     /**
@@ -16,13 +18,13 @@ public class Gene {
      * this is not necessary: the only constraint is that a better solution
      * must have a strictly higher fitness than a worse solution
      */
-    protected float mFitness;
-    protected Boolean isEvaluated;
+    public float mFitness;
+    public Boolean isEvaluated;
     /**
      * The chromosome contains only integers 0 or 1 (we choose to avoid
      * using a boolean type to make computations easier)
      */
-    protected int mChromosome[];
+    public int mChromosome[];
     public int decodedChromosome[][];
 
     // --- functions:
@@ -51,8 +53,8 @@ public class Gene {
         
         getPhenotype(mChromosome);
         
-        System.out.println(Arrays.toString(mChromosome));
-        printPhenotype(decodedChromosome);
+        //System.out.println(Arrays.toString(mChromosome));
+        //printPhenotype(decodedChromosome);
     }
     
     public void getPhenotype(int[] chromosome){
@@ -102,33 +104,28 @@ public class Gene {
      * These offspring will need to be added to the next generation.
      */
     public Gene[] reproduce(Gene other){
-        Gene[] result = new Gene[2];
+    	
+        Gene[] result = new Gene[GeneticAlgorithm.POPULATION_SIZE/2];
         
-        result[0] = new Gene();
-        result[1] = new Gene();
+        for(int i = 0; i < GeneticAlgorithm.POPULATION_SIZE/2; i++) result[i] = new Gene();
         
-        for(int i = 0; i < 44; i++){
-        	if(i < 8){
-        		result[0].mChromosome[i] = mChromosome[i];
-        		result[1].mChromosome[i] = other.mChromosome[i];
-        	}
-        	else if(i < 20){
-        		result[1].mChromosome[i] = mChromosome[i];
-        		result[0].mChromosome[i] = other.mChromosome[i];
-        		
-        	}
-        	else if(i < 32){
-        		result[0].mChromosome[i] = mChromosome[i];
-        		result[1].mChromosome[i] = other.mChromosome[i];
-        		
-        	}
-        	else if(i < 44){
-        		result[1].mChromosome[i] = mChromosome[i];
-        		result[0].mChromosome[i] = other.mChromosome[i];
-        		
-        	}
+        for(int j = 0; j < GeneticAlgorithm.POPULATION_SIZE/2; j++ ){
+	        for(int i = 0; i < 44; i++){
+	        	
+	        	boolean firstTop = true;	
+	        	Random rand = new Random();
+	        	
+	        	if(mChromosome[i] < other.mChromosome[i]) firstTop = false;
+	        	
+	        	
+	        	if(mChromosome[i] == other.mChromosome[i]) result[j].mChromosome[i] = mChromosome[i];
+	        	else if(firstTop) result[j].mChromosome[i] = rand.nextInt(mChromosome[i] - other.mChromosome[i]) + other.mChromosome[i];
+	        	else result[j].mChromosome[i] = rand.nextInt(other.mChromosome[i] - mChromosome[i]) + mChromosome[i];
+	        	
+	        }
         }
         
+
         return result;
     }
 
@@ -190,6 +187,15 @@ public class Gene {
         }
         return result;
     }
+
     
     
+}
+
+class GeneFitnessComparator implements Comparator<Gene> {
+    public int compare(Gene gene1, Gene gene2) {
+    	if(gene1.getFitness() < gene2.getFitness()) return 1;
+    	if(gene1.getFitness() > gene2.getFitness()) return -1;
+    	return 0;
+    }
 }

@@ -1,13 +1,19 @@
 package pacman.genetic;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collections;
 
 import pacman.Executor;
 import pacman.controllers.GenController;
 import pacman.controllers.examples.Legacy;
 
+import java.util.Arrays;
 import java.util.Random;        // for generating random numbers
 import java.util.ArrayList;     // arrayLists are more versatile than arrays
+import java.util.Scanner;
 
 
 /**
@@ -22,7 +28,7 @@ import java.util.ArrayList;     // arrayLists are more versatile than arrays
 public class GeneticAlgorithm {
     // --- constants
     static int CHROMOSOME_SIZE=44;
-    static int POPULATION_SIZE=500;
+    static int POPULATION_SIZE=10;
 
     // --- variables:
 
@@ -56,9 +62,7 @@ public class GeneticAlgorithm {
      * evaluated (e.g based on its performance)
      */
     public void evaluateGeneration(){
-        for(int i = 0; i < mPopulation.size(); i++){
-            // evaluation of the fitness function for each gene in the population goes HERE
-        }
+        Collections.sort(mPopulation, new GeneFitnessComparator());
     }
     /**
      * With each gene's fitness as a guide, chooses which genes should mate and produce offspring.
@@ -73,43 +77,19 @@ public class GeneticAlgorithm {
     		mPopulation.get(rand.nextInt(POPULATION_SIZE)).mutate();
     	}
     	
-    	float first = Float.NEGATIVE_INFINITY;
-    	int firstIndex = 0;
-    	float second = Float.NEGATIVE_INFINITY;
-    	int secondIndex = 0;
+    	Gene[] newGenes = new Gene[POPULATION_SIZE/2];
+    	for(int i = 0; i < POPULATION_SIZE/2; i++) newGenes[i] = new Gene();
     	
-    	float last = Float.POSITIVE_INFINITY;
-    	int lastIndex = 0;
-    	float secondToLast = Float.POSITIVE_INFINITY;
-    	int secondToLastIndex = 0;
+    	newGenes = mPopulation.get(0).reproduce(mPopulation.get(1));
     	
     	
-    	for(int i = 0; i < POPULATION_SIZE; i++){
-    		if(mPopulation.get(i).getFitness() > first){
-    			firstIndex = i;
-    			first = mPopulation.get(i).getFitness();
-    		}
-    		else if(mPopulation.get(i).getFitness() > second){	
-    			secondIndex = i;
-    			second = mPopulation.get(i).getFitness();
-    		}
-    		else if(mPopulation.get(i).getFitness() < last){
-    			lastIndex = i;
-    			last = mPopulation.get(i).getFitness();
-    			
-    		}
-    		else if(mPopulation.get(i).getFitness() < secondToLast){
-    			secondToLastIndex = 0;
-    			secondToLast =  mPopulation.get(i).getFitness();
-    		}
+    	for(int i = 0; i < POPULATION_SIZE/2; i++){
+    		
+    		mPopulation.set(i+POPULATION_SIZE/2, newGenes[i]);
+    		mPopulation.get(i+POPULATION_SIZE/2).getPhenotype(mPopulation.get(i+POPULATION_SIZE/2).mChromosome);
+    		
     	}
     	
-    	Gene[] newGenes = new Gene[2];
-    	
-    	newGenes = mPopulation.get(firstIndex).reproduce(mPopulation.get(secondIndex));
-    	
-    	mPopulation.set(lastIndex, newGenes[0]);
-    	mPopulation.set(secondToLastIndex, newGenes[1]);
     	
     }
 
@@ -123,55 +103,109 @@ public class GeneticAlgorithm {
      * @param index: the position in the population of the Gene we want to retrieve
      * @return the Gene at position <b>index</b> of the mPopulation arrayList
      */
+    public static void display_menu() {
+        System.out.println ( "1) Lanzar el algoritmo genetico \n2) Correr un test no visual \n3) Correr un test visual" );
+        System.out.print ( "Selection: " );
+      }
+    public static void write (String filename, int[] x) throws IOException{
+    	  BufferedWriter outputWriter = null;
+    	  outputWriter = new BufferedWriter(new FileWriter(filename));
+    	  for(int i = 0; i < 44; i++) outputWriter.write(x[i]+" ");  
+    	  outputWriter.flush();  
+    	  outputWriter.close();  
+    }
+    
     public  Gene getGene(int index){ return mPopulation.get(index); }
 
     // Genetic Algorithm maxA testing method
-    public static void main( String[] args ){
-        // Initializing the population (we chose 500 genes for the population,
-        // but you can play with the population size to try different approaches)
-        GeneticAlgorithm population = new GeneticAlgorithm(POPULATION_SIZE);
+    public static void main( String[] args ) throws IOException{
+    	
+    	GeneticAlgorithm population = new GeneticAlgorithm(POPULATION_SIZE);
         Executor exec = new Executor();
-        
-        int generationCount = 0;
-        
-        while(true){
-	        for(int i = 0; i < POPULATION_SIZE; i++){ 
-	        		population.getGene(i).setFitness((float) exec.runExperiment(new GenController(population.getGene(1).decodedChromosome), new Legacy(), 10));
-	        }
-        
-            // --- evaluate current generation:
-            population.evaluateGeneration();
-            // --- print results here:
-            // we choose to print the average fitness,
-            // as well as the maximum and minimum fitness
-            // as part of our progress monitoring
-            float avgFitness=0.f;
-            float minFitness=Float.POSITIVE_INFINITY;
-            float maxFitness=Float.NEGATIVE_INFINITY;
-            String bestIndividual="";
-            String worstIndividual="";
-            for(int i = 0; i < population.size(); i++){
-                float currFitness = population.getGene(i).getFitness();
-                avgFitness += currFitness;
-                if(currFitness < minFitness){
-                    minFitness = currFitness;
-                    worstIndividual = population.getGene(i).getPhenotype();
-                }
-                if(currFitness > maxFitness){
-                    maxFitness = currFitness;
-                    bestIndividual = population.getGene(i).getPhenotype();
-                }
-            }
-            if(population.size()>0){ avgFitness = avgFitness/population.size(); }
-            String output = "Generation: " + generationCount;
-            output += "\t AvgFitness: " + avgFitness;
-            output += "\t MinFitness: " + minFitness + " (" + worstIndividual +")";
-            output += "\t MaxFitness: " + maxFitness + " (" + bestIndividual +")";
-            System.out.println(output);
-            // produce next generation:
-            population.produceNextGeneration();
-            generationCount++;
-        }
+    	Scanner in = new Scanner ( System.in );
+    	    
+    	    display_menu();
+    	    switch ( in.nextInt() ) {
+    	      case 1:
+    	        System.out.println ( "You picked option 1" );
+    	        
+    	        
+    	        int generationCount = 0;
+    	        
+    	        while(true){
+    	        	
+    	        	// --- evaluate current generation:
+    		        for(int i = 0; i < POPULATION_SIZE; i++){
+    	        		population.getGene(i).setFitness((float) exec.runExperiment(new GenController(population.getGene(i).decodedChromosome), new Legacy(), 5));
+    		        }
+    	            population.evaluateGeneration();
+    	            // --- print results here:
+    	            // we choose to print the average fitness,
+    	            // as well as the maximum and minimum fitness
+    	            // as part of our progress monitoring
+    	            float avgFitness=0.f;
+    	            float minFitness=population.getGene(POPULATION_SIZE-1).getFitness();
+    	            float maxFitness=population.getGene(0).getFitness();
+    	            String bestIndividual=population.getGene(0).getPhenotype();
+    	            String worstIndividual=population.getGene(POPULATION_SIZE-1).getPhenotype();;
+    	            for(int i = 0; i < population.size(); i++){
+    	                float currFitness = population.getGene(i).getFitness();
+    	                avgFitness += currFitness;
+    	            }
+    	            if(population.size()>0){ avgFitness = avgFitness/population.size(); }
+    	            String output = "Generation: " + generationCount;
+    	            output += "\t AvgFitness: " + avgFitness;
+    	            output += "\t MinFitness: " + minFitness + " (" + worstIndividual +")";
+    	            output += "\t MaxFitness: " + maxFitness + " (" + bestIndividual +")";
+    	            System.out.println(output);
+    	            // produce next generation:
+    	            population.produceNextGeneration();
+    	            generationCount++;
+    	            if(maxFitness > 15000) break;
+    	        }
+    	        write("BestGene.txt",population.getGene(0).mChromosome);
+    	        break;
+    	      case 2:{
+    	    	System.out.println ( "You picked option 2" );
+	    	    Scanner scanner = new Scanner(new File("BestGene.txt"));
+	    	    int [] chromosome = new int [44];
+	    	    int i = 0;
+	    	    while(scanner.hasNextInt()){
+	    	        chromosome[i++] = scanner.nextInt();
+	    	    } 
+	    	    
+	    	    Gene bestGene = new Gene();
+	    	    bestGene.mChromosome = chromosome;
+	    	    bestGene.getPhenotype(bestGene.mChromosome);
+	    	    
+	    	    float result = (float) exec.runExperiment(new GenController(bestGene.decodedChromosome), new Legacy(), 1);
+	    	    System.out.println("The experiment with the greatest recorded gene has a result of: "+result);
+	    	    scanner.close();
+	    	    break;
+    	      }
+    	      case 3:{
+    	        System.out.println ( "You picked option 3" );
+	    	    Scanner scanner = new Scanner(new File("BestGene.txt"));
+	    	    int [] chromosome = new int [44];
+	    	    int i = 0;
+	    	    while(scanner.hasNextInt()){
+	    	        chromosome[i++] = scanner.nextInt();
+	    	    } 
+	    	    
+	    	    Gene bestGene = new Gene();
+	    	    bestGene.mChromosome = chromosome;
+	    	    bestGene.getPhenotype(bestGene.mChromosome);
+	    	    
+	    	    exec.runGameTimed(new GenController(bestGene.decodedChromosome), new Legacy(), true);
+	    	    scanner.close();
+	    	    break;
+    	      }
+    	      default:
+    	        System.err.println ( "Unrecognized option" );
+    	        break;
+    	    }
+        in.close();
+       
         
         
     }
