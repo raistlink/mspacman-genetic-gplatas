@@ -28,7 +28,7 @@ import java.util.Scanner;
 public class GeneticAlgorithm {
     // --- constants
     static int CHROMOSOME_SIZE=44;
-    static int POPULATION_SIZE=10;
+    static int POPULATION_SIZE=50;
 
     // --- variables:
 
@@ -136,7 +136,7 @@ public class GeneticAlgorithm {
     	        	
     	        	// --- evaluate current generation:
     		        for(int i = 0; i < POPULATION_SIZE; i++){
-    	        		population.getGene(i).setFitness((float) exec.runExperiment(new GenController(population.getGene(i).decodedChromosome), new Legacy(), 5));
+    	        		population.getGene(i).setFitness((float) exec.runExperiment(new GenController(population.getGene(i).decodedChromosome), new Legacy(), 10));
     		        }
     	            population.evaluateGeneration();
     	            // --- print results here:
@@ -146,8 +146,6 @@ public class GeneticAlgorithm {
     	            float avgFitness=0.f;
     	            float minFitness=population.getGene(POPULATION_SIZE-1).getFitness();
     	            float maxFitness=population.getGene(0).getFitness();
-    	            String bestIndividual=population.getGene(0).getPhenotype();
-    	            String worstIndividual=population.getGene(POPULATION_SIZE-1).getPhenotype();;
     	            for(int i = 0; i < population.size(); i++){
     	                float currFitness = population.getGene(i).getFitness();
     	                avgFitness += currFitness;
@@ -155,15 +153,19 @@ public class GeneticAlgorithm {
     	            if(population.size()>0){ avgFitness = avgFitness/population.size(); }
     	            String output = "Generation: " + generationCount;
     	            output += "\t AvgFitness: " + avgFitness;
-    	            output += "\t MinFitness: " + minFitness + " (" + worstIndividual +")";
-    	            output += "\t MaxFitness: " + maxFitness + " (" + bestIndividual +")";
+    	            output += "\t MinFitness: " + minFitness;
+    	            output += "\t MaxFitness: " + maxFitness;
     	            System.out.println(output);
     	            // produce next generation:
     	            population.produceNextGeneration();
     	            generationCount++;
-    	            if(maxFitness > 15000) break;
+    	            if(maxFitness > 30000) break;
     	        }
     	        write("BestGene.txt",population.getGene(0).mChromosome);
+    	        System.out.println("El mejor individuo de la poblacion tiene el siguiente genotipo:");
+    	        System.out.println(Arrays.toString(population.getGene(0).mChromosome));
+    	        System.out.println("El mejor individuo de la poblacion tiene el siguiente genotipo:");
+    	        population.getGene(0).printPhenotype (population.getGene(0).decodedChromosome);
     	        break;
     	      case 2:{
     	    	System.out.println ( "You picked option 2" );
