@@ -107,7 +107,7 @@ public final class Game
 	/**
 	 * Empty constructor used by the copy method.
 	 */
-	private Game(){}
+	public Game(){}
 	
 	/**
 	 * _init.

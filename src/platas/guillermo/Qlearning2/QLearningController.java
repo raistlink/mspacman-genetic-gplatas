@@ -1,4 +1,4 @@
-package platas.guillermo.Qlearning;
+package platas.guillermo.Qlearning2;
 
 import java.util.EnumMap;
 
@@ -30,42 +30,40 @@ public class QLearningController extends Controller<EnumMap<GHOST,MOVE>> {
 	public QLearningController(){
 	}
 	
-	
-	@SuppressWarnings("unused")
+
 	@Override
 	public EnumMap<GHOST, MOVE> getMove(Game game, long timeDue) {
 		
-	
+		
 		EnumMap<GHOST,MOVE> myMoves=new EnumMap<GHOST,MOVE>(GHOST.class);
-		myMoves.put(GHOST.PINKY, game.getGhostLastMoveMade(GHOST.PINKY).opposite());
+		myMoves.put(GHOST.BLINKY, game.getGhostLastMoveMade(GHOST.BLINKY).opposite());
 		myMoves.put(GHOST.INKY, game.getGhostLastMoveMade(GHOST.INKY).opposite());
 		myMoves.put(GHOST.SUE, game.getGhostLastMoveMade(GHOST.SUE).opposite());
+		
+		
+		
 		if(counter <= 0){
-			learner = new QLearner(game);
+			learner = new QLearner(new Environment(game));
 			learner.initialize();
 			counter++;
 		}
 		
-		State s = learner.getState(game);
-		int a = learner.getAction(s);
+		Environment e = new Environment(game);
 		
-		MOVE nextMove = null;
-		if(a == 0) nextMove = MOVE.UP;
-		if(a == 1) nextMove = MOVE.DOWN;
-		if(a == 2) nextMove = MOVE.LEFT;
-		if(a == 3) nextMove = MOVE.RIGHT;
+		State s = learner.getState(e);
+		MOVE a = learner.getAction(s);
 		
-		float r = s.getActualReward();
 		
-		if(game.getNeighbour(game.getGhostCurrentNodeIndex(GHOST.BLINKY),nextMove) > 1 && game.getNeighbour(game.getGhostCurrentNodeIndex(GHOST.BLINKY),nextMove) < game.getCurrentMaze().graph.length){
-			int sprime = (int) learner.qvalues.qvalues[(game.getNeighbour(game.getGhostCurrentNodeIndex(GHOST.BLINKY),nextMove))][a];
+		float r = e.getActualReward();
+		
+		if(game.getNeighbour(game.getGhostCurrentNodeIndex(GHOST.BLINKY),a) > 1 && game.getNeighbour(game.getGhostCurrentNodeIndex(GHOST.PINKY),a) < game.getCurrentMaze().graph.length){
+			State sprime = new State(new Environment((game.getNeighbour(game.getGhostCurrentNodeIndex(GHOST.PINKY),a)), game));
 			learner.update(s, a, r, sprime);
 		}
 
 		
 		
-		myMoves.put(GHOST.PINKY, nextMove);
-		System.out.println(a);
+		myMoves.put(GHOST.PINKY, a);
 		
 		return myMoves;
 	}
